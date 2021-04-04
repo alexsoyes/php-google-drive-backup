@@ -2,7 +2,15 @@
 
 A (very) simple CLI tool that I used to backup my www directory and my database from OVH to Google Drive, in a cronjob.
 
-⚠️**You should never trust a script found on GitHub to backup your data!** 🔥
+🎉
+
+![OAuth scopes in Google Cloud Console](./docs/google_drive_backups_ovh.jpg)
+
+## Disclaimer
+
+⚠️**You should never trust a script found on GitHub to backup your data!** 
+
+🔥 I made this script in a few hours. It not perfect, but it works very well.
 
 ## Getting started 🔧
 
@@ -20,7 +28,7 @@ You need to configure your Google Cloud Console account first.
 * ❌ **Do not activate the "production review" since:**
   * You do not need it.
   * It will make you unable to continue the process.
-* Run the project using CLI.
+* Run the project using CLI (locally if you have to).
 * Then, generate the proper `token.json` file by logging with the given URL from CLI.
   * Authenticate yourself with your Google Account...
 * All good! ✅
@@ -29,7 +37,7 @@ You need to configure your Google Cloud Console account first.
 
 The following environment variables must be declared.
 
-If you do not know how it works, just create a file named `.env.local` in the root directory with your own configuration.
+If you do not know how it works, just create a file named `.env` in the root directory with your own configuration.
 
 (The `.env.dist` file contains a skeleton.)
 
@@ -46,14 +54,14 @@ DELETE_UPLOADED_BACKUPS=false
 ONLY_CLI=false
 ```
 
-Feel free to fill it with your data!
+Feel free to fill it with your config!
 
 ## Launching cronjob from OVH to Google Drive
 
 Here is my cronjob configuration.
 
 * I decided to run the job the first and the fifteenth of each month: `0 0 1,15 * *`
-* Log are sent by email
+* Logs are sent by email
 * All good! ✅
   
 ![Add a cronjob to start backing up in OVH](./docs/ovh_cronjob_backup_data.jpg)
