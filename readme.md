@@ -20,7 +20,9 @@ You need to configure your Google Cloud Console account first.
 * ❌ **Do not activate the "production review" since:**
   * You do not need it.
   * It will make you unable to continue the process.
-* Then, generate the proper `token.json` file by logging with the given URL.
+* Run the project using CLI.
+* Then, generate the proper `token.json` file by logging with the given URL from CLI.
+  * Authenticate yourself with your Google Account...
 * All good! ✅
 
 ## Environments variables 🚀
@@ -44,7 +46,7 @@ DELETE_UPLOADED_BACKUPS=false
 ONLY_CLI=false
 ```
 
-Feel free to file it with your data!
+Feel free to fill it with your data!
 
 ## Launching cronjob from OVH to Google Drive
 
@@ -53,6 +55,8 @@ Here is my cronjob configuration.
 * I decided to run the job the first and the fifteenth of each month: `0 0 1,15 * *`
 * Log are sent by email
 * All good! ✅
+  
+![Add a cronjob to start backing up in OVH](./docs/ovh_cronjob_backup_data.jpg)
 
 ## Developer resources 📝
 
