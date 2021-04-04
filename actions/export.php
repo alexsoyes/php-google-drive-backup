@@ -34,6 +34,10 @@ class Export
     {
         $zipBinaryFile = exec('which zip');
 
+        if (!file_exists($pathToZip)) {
+            throw new Exception(sprintf('Error, path to archive does not exist: %s', $pathToZip));
+        }
+
         $command = "$zipBinaryFile -r $pathForZippedFile $pathToZip";
 
         exec($command);

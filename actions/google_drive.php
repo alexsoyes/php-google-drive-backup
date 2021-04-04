@@ -103,7 +103,7 @@ class GoogleDrive
             throw new \Exception("File does not exist: $filepathToUpload");
         }
 
-        echo "Uploading... $filepathToUpload\n";
+        Output::log("Uploading... $filepathToUpload\n");
 
         try {
             $optParams = [

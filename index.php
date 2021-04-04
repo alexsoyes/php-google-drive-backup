@@ -20,13 +20,14 @@ $ENVS = [
     "DB_PASSWORD",
     "DB_NAME",
     "DB_PORT",
+    "DIRECTORY_TO_BACKUP",
     "DELETE_UPLOADED_BACKUPS",
-    "GDRIVE_DESTINATION_FOLDER",
     "ONLY_CLI",
+//    "GDRIVE_DESTINATION_FOLDER", not mandatory
 ];
 
 foreach ($ENVS as $ENV) {
-    if (strpos($_ENV['SYMFONY_DOTENV_VARS'], $ENV) === -1) {
+    if (strpos($_ENV['SYMFONY_DOTENV_VARS'], $ENV) === false) {
         throw new Exception(sprintf('Your env variables should be configured for %s.', $ENV));
     }
 }
@@ -44,7 +45,7 @@ if (!$parentFolderId)
 }
 
 $pathForZippedFile = "backups/www_$timestamp.zip";
-$zippedWebDir = Export::doArchive('/home/alexandre/Bureau/solid', $pathForZippedFile);
+$zippedWebDir = Export::doArchive($_ENV['DIRECTORY_TO_BACKUP'], $pathForZippedFile);
 if ($zippedWebDir) {
     $drive->upload($zippedWebDir, $parentFolderId);
 } else {
@@ -64,9 +65,8 @@ if ($dumpedDatabase) {
 echo "\n";
 
 if ($_ENV['DELETE_UPLOADED_BACKUPS'] === "true") {
-    echo exec("[ -f $pathForDumpedFile ] && rm -v $pathForDumpedFile") . "\n";
-    echo exec("[ -f $pathForZippedFile ] && rm -v $pathForZippedFile") . "\n";
-    echo "\n";
+    Output::log(exec("[ -f $pathForDumpedFile ] && rm -v $pathForDumpedFile") . "\n", Output::COLOR_INFO);
+    Output::log(exec("[ -f $pathForZippedFile ] && rm -v $pathForZippedFile") . "\n\n", Output::COLOR_INFO);
 }
 
 Output::log('You can contribute or open an issue here: https://github.com/alexsoyes/php-google-drive-backup', Output::COLOR_INFO);
