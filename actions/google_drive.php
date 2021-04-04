@@ -3,6 +3,7 @@
 class GoogleDrive
 {
     private Google_Service_Drive $service;
+    private Google_Client $client;
 
     /**
      * GoogleDrive constructor.
@@ -65,6 +66,7 @@ class GoogleDrive
         }
 
         $this->service = new Google_Service_Drive($client);
+        $this->client = $client;
     }
 
     /**
@@ -106,29 +108,83 @@ class GoogleDrive
         Output::log("Uploading... $filepathToUpload\n");
 
         try {
-            $optParams = [
-                'name' => basename($filepathToUpload)
-            ];
+            $optParams = [];
 
             if ($parentFolderId) {
                 $optParams['parents'] = [$parentFolderId];
             }
 
             $file = new Google_Service_Drive_DriveFile($optParams);
+            $file->setName(basename($filepathToUpload));
 
-            $request = $this->service->files->create($file, [
-                'data' => file_get_contents($filepathToUpload),
-                'mimeType' => mime_content_type($filepathToUpload),
-                'uploadType' => 'media',
-            ]);
+            $chunkSizeBytes = 1 * 1024 * 1024;
 
-            if ($request->getId()) {
-                Output::log('Ok', Output::COLOR_SUCCESS);
+            $this->client->setDefer(true);
+
+            $request = $this->service->files->create($file);
+
+            // Create a media file upload to represent our upload process.
+            $media = new Google\Http\MediaFileUpload(
+                $this->client,
+                $request,
+                mime_content_type($filepathToUpload),
+                null,
+                true,
+                $chunkSizeBytes
+            );
+            $media->setFileSize(filesize($filepathToUpload));
+
+            // Upload the various chunks. $status will be false until the process is
+            // complete.
+            $status = false;
+            $handle = fopen($filepathToUpload, "rb");
+            while (!$status && !feof($handle))
+            {
+                $chunk = $this->readFileChunck($handle, $chunkSizeBytes);
+                $status = $media->nextChunk($chunk);
+            }
+
+            // The final value of $status will be the data from the API for the object
+            /** @var Google_Service_Drive_DriveFile $fileUploaded */
+            $fileUploaded = false;
+            if ($status != false) {
+                $fileUploaded = $status;
+            }
+
+            fclose($handle);
+
+            if ($id = $fileUploaded->getId()) {
+                Output::log(sprintf('Ok %s', $id), Output::COLOR_SUCCESS);
             }
 
         } catch (Exception $e) {
             Output::log($e->getMessage(), Output::COLOR_ERROR);
+        } finally {
+            $this->client->setDefer(false);
         }
+    }
+
+    /**
+     * @param $handle
+     * @param $chunkSize
+     * @return string
+     * @see https://github.com/googleapis/google-api-php-client/blob/master/examples/large-file-upload.php#L133
+     */
+    private function readFileChunck($handle, $chunkSize)
+    {
+        $byteCount = 0;
+        $giantChunk = "";
+        while (!feof($handle)) {
+            // fread will never return more than 8192 bytes if the stream is read buffered and it does not represent a plain file
+            $chunk = fread($handle, 8192);
+            $byteCount += strlen($chunk);
+            $giantChunk .= $chunk;
+            if ($byteCount >= $chunkSize)
+            {
+                return $giantChunk;
+            }
+        }
+        return $giantChunk;
     }
 }
 
