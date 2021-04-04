@@ -1,0 +1,10 @@
+vendor/
+.idea/
+
+backups/*
+!backups/.gitkeep
+
+credentials.json
+token.json
+
+.env
