@@ -2,8 +2,10 @@
 
 class GoogleDrive
 {
-    private Google_Service_Drive $service;
-    private Google_Client $client;
+    /** @var Google_Service_Drive */
+    private $service;
+    /** @var Google_Client  */
+    private $client;
 
     /**
      * GoogleDrive constructor.
@@ -23,7 +25,7 @@ class GoogleDrive
         $client = new Google_Client();
         $client->setApplicationName('Google Drive API PHP Quickstart');
         $client->setScopes(Google_Service_Drive::DRIVE_FILE);
-        $client->setAuthConfig('credentials.json');
+        $client->setAuthConfig(dirname(__FILE__)  . '/../credentials.json');
         $client->setAccessType('offline');
         $client->setPrompt('select_account consent');
 
